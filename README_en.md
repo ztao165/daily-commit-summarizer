@@ -86,6 +86,7 @@ Go to Repo → Settings → Secrets and variables → Actions → New repository
 * OPENAI_BASE_URL → Your OpenAI (or compatible LLM provider) base URL.
 * LARK_WEBHOOK_URL → Feishu group Custom Bot Webhook URL.
 * REPO → Your GitHub repository name.
+* REPO_CLONE_TOKEN → GitHub Personal Access Token with read access to the target repository (needed for checkout).
 
 **4. Install dependencies**
 

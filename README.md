@@ -87,6 +87,7 @@ jobs:
 2. OPENAI_BASE_URL → LLM 服务的基础 URL
 3. LARK_WEBHOOK_URL → 飞书群自定义机器人 Webhook 地址
 4. REPO → 你的 GitHub 仓库名
+5. REPO_CLONE_TOKEN → 用于 checkout 目标仓库的 GitHub Personal Access Token（至少需要读取代码的权限）
 
 **4. 安装依赖**
 

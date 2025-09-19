@@ -11,11 +11,12 @@ jobs:
     env:
       TZ: Asia/Shanghai
     steps:
-      - name: Checkout
+      - name: Checkout target repository
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          repository: 'SwallowedStarX/backendx-cms'
+          repository: ${{ secrets.REPO }}
+          token: ${{ secrets.REPO_CLONE_TOKEN }}
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
