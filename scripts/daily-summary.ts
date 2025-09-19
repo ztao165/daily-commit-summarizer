@@ -17,7 +17,7 @@ const OPENAI_BASE_URL = process.env.OPENAI_BASE_URL || "https://api.openai.com";
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY || "";
 const LARK_WEBHOOK_URL = process.env.LARK_WEBHOOK_URL || "";
 const REPO = process.env.REPO || ""; // e.g. "org/repo"
-const MODEL_NAME = process.env.MODEL_NAME || "gpt-4.1-mini";
+const MODEL_NAME = process.env.MODEL_NAME || "deepseek-chat";
 const PER_BRANCH_LIMIT = parseInt(process.env.PER_BRANCH_LIMIT || "200", 10);
 const DIFF_CHUNK_MAX_CHARS = parseInt(
   process.env.DIFF_CHUNK_MAX_CHARS || "80000",
@@ -190,6 +190,7 @@ type ChatPayload = {
   model: string;
   messages: { role: "system" | "user" | "assistant"; content: string }[];
   temperature?: number;
+  stream?: boolean;
 };
 
 async function chat(prompt: string): Promise<string> {
@@ -197,6 +198,7 @@ async function chat(prompt: string): Promise<string> {
     model: MODEL_NAME,
     messages: [{ role: "user", content: prompt }],
     temperature: 0.2,
+    stream: false,
   };
   const body = JSON.stringify(payload);
 
@@ -205,7 +207,7 @@ async function chat(prompt: string): Promise<string> {
     const req = https.request(
       {
         hostname: url.hostname,
-        path: `/openai/deployments/${MODEL_NAME}/chat/completions?api-version=2024-12-01-preview`,
+        path: `/chat/completions`,
         method: "POST",
         headers: {
           "Content-Type": "application/json",
