@@ -89,9 +89,7 @@ jobs:
 4. REPO → 你的 GitHub 仓库名
 5. REPO_CLONE_TOKEN → 用于 checkout 目标仓库的 GitHub Personal Access Token（至少需要读取代码的权限）
 
-**4. 安装依赖**
-
-`npm install`
+> 小贴士：脚本通过 `npx --yes tsx` 直接运行，无需在 Workflow 中执行 `npm install`，可避免目标仓库旧依赖的构建失败。
 
 <br/>
 

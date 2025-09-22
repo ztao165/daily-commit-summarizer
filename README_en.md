@@ -88,9 +88,7 @@ Go to Repo → Settings → Secrets and variables → Actions → New repository
 * REPO → Your GitHub repository name.
 * REPO_CLONE_TOKEN → GitHub Personal Access Token with read access to the target repository (needed for checkout).
 
-**4. Install dependencies**
-
-`npm install`
+> Tip: The script runs via `npx --yes tsx`, so you can drop `npm install` from the workflow to avoid legacy dependency build failures in the target repository.
 
 <br/>
 

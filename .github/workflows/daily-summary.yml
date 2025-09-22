@@ -23,10 +23,6 @@ jobs:
         with:
           node-version: "20"
 
-      - name: Install dependencies
-        run: |
-          npm install
-
       - name: Run summarizer
         env:
           OPENAI_BASE_URL: ${{ secrets.OPENAI_BASE_URL }}
@@ -34,4 +30,4 @@ jobs:
           LARK_WEBHOOK_URL: ${{ secrets.LARK_WEBHOOK_URL }}
           REPO: ${{ secrets.REPO }}
         run: |
-          npx tsx scripts/daily-summary.ts
+          npx --yes tsx scripts/daily-summary.ts
