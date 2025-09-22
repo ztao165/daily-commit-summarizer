@@ -11,12 +11,18 @@ jobs:
     env:
       TZ: Asia/Shanghai
     steps:
+      - name: Checkout summarizer
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
       - name: Checkout target repository
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
           repository: ${{ secrets.REPO }}
           token: ${{ secrets.REPO_CLONE_TOKEN }}
+          path: target-repo
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -24,10 +30,11 @@ jobs:
           node-version: "20"
 
       - name: Run summarizer
+        working-directory: target-repo
         env:
           OPENAI_BASE_URL: ${{ secrets.OPENAI_BASE_URL }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           LARK_WEBHOOK_URL: ${{ secrets.LARK_WEBHOOK_URL }}
           REPO: ${{ secrets.REPO }}
         run: |
-          npx --yes tsx scripts/daily-summary.ts
+          npx --yes tsx ../scripts/daily-summary.ts

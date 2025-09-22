@@ -56,28 +56,33 @@ jobs:
     env:
       TZ: Asia/Shanghai
     steps:
-      - name: Checkout
+      - name: Checkout summarizer
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+
+      - name: Checkout target repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          repository: ${{ secrets.REPO }}
+          token: ${{ secrets.REPO_CLONE_TOKEN }}
+          path: target-repo
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: "20"
 
-      - name: Install dependencies
-        run: |
-          npm install
-
       - name: Run summarizer
+        working-directory: target-repo
         env:
           OPENAI_BASE_URL: ${{ secrets.OPENAI_BASE_URL }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           LARK_WEBHOOK_URL: ${{ secrets.LARK_WEBHOOK_URL }}
           REPO: ${{ secrets.REPO }}
         run: |
-          npx tsx scripts/daily-summary.ts
+          npx --yes tsx ../scripts/daily-summary.ts
 ```
 **3. Add repository secrets**
 
@@ -88,7 +93,7 @@ Go to Repo → Settings → Secrets and variables → Actions → New repository
 * REPO → Your GitHub repository name.
 * REPO_CLONE_TOKEN → GitHub Personal Access Token with read access to the target repository (needed for checkout).
 
-> Tip: The script runs via `npx --yes tsx`, so you can drop `npm install` from the workflow to avoid legacy dependency build failures in the target repository.
+> Tip: The script runs via `npx --yes tsx`, so you can drop `npm install` from the workflow to avoid legacy dependency build failures. Make sure the `working-directory` matches the `path` used in the “Checkout target repository” step (`target-repo` in the example).
 
 <br/>
 

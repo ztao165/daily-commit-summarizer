@@ -56,28 +56,33 @@ jobs:
     env:
       TZ: Asia/Shanghai
     steps:
-      - name: Checkout
+      - name: Checkout summarizer
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+
+      - name: Checkout target repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          repository: ${{ secrets.REPO }}
+          token: ${{ secrets.REPO_CLONE_TOKEN }}
+          path: target-repo
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: "20"
 
-      - name: Install dependencies
-        run: |
-          npm install
-
       - name: Run summarizer
+        working-directory: target-repo
         env:
           OPENAI_BASE_URL: ${{ secrets.OPENAI_BASE_URL }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           LARK_WEBHOOK_URL: ${{ secrets.LARK_WEBHOOK_URL }}
           REPO: ${{ secrets.REPO }}
         run: |
-          npx tsx scripts/daily-summary.ts
+          npx --yes tsx ../scripts/daily-summary.ts
 ```
 
 **3. 添加仓库密钥**
@@ -89,7 +94,7 @@ jobs:
 4. REPO → 你的 GitHub 仓库名
 5. REPO_CLONE_TOKEN → 用于 checkout 目标仓库的 GitHub Personal Access Token（至少需要读取代码的权限）
 
-> 小贴士：脚本通过 `npx --yes tsx` 直接运行，无需在 Workflow 中执行 `npm install`，可避免目标仓库旧依赖的构建失败。
+> 小贴士：脚本通过 `npx --yes tsx` 直接运行，无需在 Workflow 中执行 `npm install`，可避免目标仓库旧依赖的构建失败；请保证 `working-directory` 与上方 `Checkout target repository` 的 `path` 保持一致（示例中均为 `target-repo`）。
 
 <br/>
 
