@@ -8,6 +8,25 @@ on:
 jobs:
   run:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - repo: SwallowedStarX/backendx-api
+            path: target-backendx-api
+          - repo: SwallowedStarX/backendx-cms
+            path: target-backendx-cms
+          - repo: SwallowedStarX/backendx-crm
+            path: target-backendx-crm
+          - repo: SwallowedStarX/backendx-etc
+            path: target-backendx-etc
+          - repo: SwallowedStarX/backendx-mcs
+            path: target-backendx-mcs
+          - repo: SwallowedStarX/backendx-rms
+            path: target-backendx-rms
+          - repo: SwallowedStarX/backendx-bi
+            path: target-backendx-bi
+          - repo: SwallowedStarX/backendx-scaffold
+            path: target-backendx-scaffold
     env:
       TZ: Asia/Shanghai
     steps:
@@ -16,13 +35,13 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Checkout target repository
+      - name: Checkout target repository (${{ matrix.repo }})
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          repository: ${{ secrets.REPO }}
+          repository: ${{ matrix.repo }}
           token: ${{ secrets.REPO_CLONE_TOKEN }}
-          path: target-repo
+          path: ${{ matrix.path }}
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -30,11 +49,11 @@ jobs:
           node-version: "20"
 
       - name: Run summarizer
-        working-directory: target-repo
+        working-directory: ${{ matrix.path }}
         env:
           OPENAI_BASE_URL: ${{ secrets.OPENAI_BASE_URL }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           LARK_WEBHOOK_URL: ${{ secrets.LARK_WEBHOOK_URL }}
-          REPO: ${{ secrets.REPO }}
+          REPO: ${{ matrix.repo }}
         run: |
           npx --yes tsx ../scripts/daily-summary.ts

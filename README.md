@@ -53,6 +53,13 @@ on:
 jobs:
   run:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - repo: your-org/repo-one
+            path: target-repo-one
+          - repo: your-org/repo-two   # 若暂时只需一个仓库，可删除此条目
+            path: target-repo-two
     env:
       TZ: Asia/Shanghai
     steps:
@@ -61,13 +68,13 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Checkout target repository
+      - name: Checkout target repository (${{ matrix.repo }})
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          repository: ${{ secrets.REPO }}
+          repository: ${{ matrix.repo }}
           token: ${{ secrets.REPO_CLONE_TOKEN }}
-          path: target-repo
+          path: ${{ matrix.path }}
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -75,12 +82,12 @@ jobs:
           node-version: "20"
 
       - name: Run summarizer
-        working-directory: target-repo
+        working-directory: ${{ matrix.path }}
         env:
           OPENAI_BASE_URL: ${{ secrets.OPENAI_BASE_URL }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           LARK_WEBHOOK_URL: ${{ secrets.LARK_WEBHOOK_URL }}
-          REPO: ${{ secrets.REPO }}
+          REPO: ${{ matrix.repo }}
         run: |
           npx --yes tsx ../scripts/daily-summary.ts
 ```
@@ -91,10 +98,11 @@ jobs:
 1. OPENAI_API_KEY → OpenAI 或兼容 LLM 服务的 API Key
 2. OPENAI_BASE_URL → LLM 服务的基础 URL
 3. LARK_WEBHOOK_URL → 飞书群自定义机器人 Webhook 地址
-4. REPO → 你的 GitHub 仓库名
-5. REPO_CLONE_TOKEN → 用于 checkout 目标仓库的 GitHub Personal Access Token（至少需要读取代码的权限）
+4. REPO_CLONE_TOKEN → 用于 checkout 目标仓库的 GitHub Personal Access Token（至少需要读取代码的权限）
 
-> 小贴士：脚本通过 `npx --yes tsx` 直接运行，无需在 Workflow 中执行 `npm install`，可避免目标仓库旧依赖的构建失败；请保证 `working-directory` 与上方 `Checkout target repository` 的 `path` 保持一致（示例中均为 `target-repo`）。
+在 `strategy.matrix.include` 中直接列出所有需要汇总的仓库与对应目录（可继续扩展为三条、四条……）。
+
+> 小贴士：脚本通过 `npx --yes tsx` 直接运行，无需在 Workflow 中执行 `npm install`，可避免目标仓库旧依赖的构建失败；请确保每条 `working-directory` 与矩阵中该仓库的 `path` 一致。
 
 <br/>
 

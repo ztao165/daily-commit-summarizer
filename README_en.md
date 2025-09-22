@@ -53,6 +53,13 @@ on:
 jobs:
   run:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - repo: your-org/repo-one
+            path: target-repo-one
+          - repo: your-org/repo-two   # Remove this entry if you only need one repository
+            path: target-repo-two
     env:
       TZ: Asia/Shanghai
     steps:
@@ -61,13 +68,13 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Checkout target repository
+      - name: Checkout target repository (${{ matrix.repo }})
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          repository: ${{ secrets.REPO }}
+          repository: ${{ matrix.repo }}
           token: ${{ secrets.REPO_CLONE_TOKEN }}
-          path: target-repo
+          path: ${{ matrix.path }}
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -75,12 +82,12 @@ jobs:
           node-version: "20"
 
       - name: Run summarizer
-        working-directory: target-repo
+        working-directory: ${{ matrix.path }}
         env:
           OPENAI_BASE_URL: ${{ secrets.OPENAI_BASE_URL }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           LARK_WEBHOOK_URL: ${{ secrets.LARK_WEBHOOK_URL }}
-          REPO: ${{ secrets.REPO }}
+          REPO: ${{ matrix.repo }}
         run: |
           npx --yes tsx ../scripts/daily-summary.ts
 ```
@@ -90,10 +97,11 @@ Go to Repo → Settings → Secrets and variables → Actions → New repository
 * OPENAI_API_KEY → Your OpenAI (or compatible LLM provider) API key.
 * OPENAI_BASE_URL → Your OpenAI (or compatible LLM provider) base URL.
 * LARK_WEBHOOK_URL → Feishu group Custom Bot Webhook URL.
-* REPO → Your GitHub repository name.
-* REPO_CLONE_TOKEN → GitHub Personal Access Token with read access to the target repository (needed for checkout).
+* REPO_CLONE_TOKEN → GitHub Personal Access Token with read access to every repository listed in the matrix (needed for checkout).
 
-> Tip: The script runs via `npx --yes tsx`, so you can drop `npm install` from the workflow to avoid legacy dependency build failures. Make sure the `working-directory` matches the `path` used in the “Checkout target repository” step (`target-repo` in the example).
+List the repositories you want to summarize directly under `strategy.matrix.include` in the workflow (add or remove items as needed).
+
+> Tip: The script runs via `npx --yes tsx`, so you can drop `npm install` from the workflow to avoid legacy dependency build failures. Make sure every `working-directory` matches the `path` declared for that repository in the matrix (e.g. `target-repo-one`).
 
 <br/>
 
