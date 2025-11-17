@@ -11,22 +11,18 @@ jobs:
     strategy:
       matrix:
         include:
-          - repo: SwallowedStarX/backendx-api
+          - repo: Global-MongoX/backend-api
             path: target-backendx-api
-          - repo: SwallowedStarX/backendx-cms
-            path: target-backendx-cms
-          - repo: SwallowedStarX/backendx-crm
+          - repo: Global-MongoX/backend-crm
             path: target-backendx-crm
-          - repo: SwallowedStarX/backendx-etc
-            path: target-backendx-etc
-          - repo: SwallowedStarX/backendx-mcs
-            path: target-backendx-mcs
-          - repo: SwallowedStarX/backendx-rms
-            path: target-backendx-rms
-          - repo: SwallowedStarX/backendx-bi
-            path: target-backendx-bi
-          - repo: SwallowedStarX/backendx-scaffold
+          - repo: Global-MongoX/backend-config
+            path: target-backendx-config
+          - repo: Global-MongoX/backend-scaffold
             path: target-backendx-scaffold
+          - repo: Global-MongoX/backend-flux
+            path: target-backendx-flux
+          - repo: Global-MongoX/backend-contract
+            path: target-backendx-contract
     env:
       TZ: Asia/Shanghai
     steps:
